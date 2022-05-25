@@ -116,13 +116,45 @@ class Tree
   end
 
   def height(node=@root)
-    return -1 if !node
+    return -1 if !node 
     left_height = height(node.left)
     right_height = height(node.right)
     return [left_height, right_height].max + 1
   end
+
+  def depth(value, root=@root)
+    return -1 if !root
+    dist = -1
+    if value == root.data ||
+        (dist = depth(value, root.left)) > -1 ||
+        (dist = depth(value, root.right)) > -1
+        return dist + 1
+    end
+    return dist
+  end
+
+  def balanced?(root=@root)
+    (height(root.left) - height(root.right)).abs < 2
+  end
+
+  def rebalance
+    array = inorder.uniq.sort { |a, b| a - b }
+    @root = build_tree(array, 0, array.length - 1)
+  end
+
+  def pretty_print(node = @root, prefix = '', is_left = true)
+    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
+    puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
+    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
+  end
 end
 
 t = Tree.new([9,8,7,6,5,4,3,2,1])
-p t.height(t.find(5))
+t.insert(10)
+t.insert(11)
+t.insert(12)
+p t.balanced?
+t.rebalance
+p t.balanced?
+t.pretty_print
 
