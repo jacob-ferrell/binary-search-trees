@@ -105,8 +105,24 @@ class Tree
     preorder(node.right, values, &block)
     return values if !block_given?
   end
+
+  def postorder(node=@root, values=[], &block)
+    return if !node
+    postorder(node.left, values, &block)
+    postorder(node.right, values, &block)
+    yield node if block_given?
+    values << node.data
+    return values if !block_given?
+  end
+
+  def height(node=@root)
+    return -1 if !node
+    left_height = height(node.left)
+    right_height = height(node.right)
+    return [left_height, right_height].max + 1
+  end
 end
 
 t = Tree.new([9,8,7,6,5,4,3,2,1])
-t.preorder { |node| p node.data}
+p t.height(t.find(5))
 
