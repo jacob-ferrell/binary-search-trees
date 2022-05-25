@@ -43,7 +43,7 @@ class Tree
   end
 
   def delete(value, node=@root)
-    return nil if !node
+    return nil if !node || !@array.include?(value)
     if value < node.data
       node.left = delete(value, node.left)
     elsif value > node.data
@@ -59,6 +59,7 @@ class Tree
         node.data = next_smallest_value
         node.right = delete(next_smallest_value, node.right)
     end
+    @array = @array.reject { |n| n === value }
     return node
   end
 
@@ -72,10 +73,40 @@ class Tree
       return node
     end
   end
+
+  def level_order
+    return nil if !block_given?
+    cur = @root
+    return nil if !cur
+    queue = [cur]
+    while queue.any?
+      yield cur  
+      queue << cur.left if cur.left
+      queue << cur.right if cur.right
+      queue.shift
+      cur = queue.first  
+    end
+  end
+
+  def inorder(node=@root, values=[], &block)
+    return if !node
+    inorder(node.left, values, &block)
+    yield node if block_given?
+    values << node.data
+    inorder(node.right, values, &block)
+    return values if !block_given?
+  end
+
+  def preorder(node=@root, values=[], &block)
+    return if !node
+    yield node if block_given?
+    values << node.data
+    preorder(node.left, values, &block)
+    preorder(node.right, values, &block)
+    return values if !block_given?
+  end
 end
 
 t = Tree.new([9,8,7,6,5,4,3,2,1])
-t.insert(0)
-t.delete(0)
-p t.find(9)
-p t.root.left.left.data
+t.preorder { |node| p node.data}
+
