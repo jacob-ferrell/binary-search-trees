@@ -75,17 +75,19 @@ class Tree
   end
 
   def level_order
-    return nil if !block_given?
     cur = @root
     return nil if !cur
     queue = [cur]
+    values = []
     while queue.any?
-      yield cur  
+      yield cur if block_given?
+      values << cur.data  
       queue << cur.left if cur.left
       queue << cur.right if cur.right
       queue.shift
       cur = queue.first  
     end
+    return values if !block_given?
   end
 
   def inorder(node=@root, values=[], &block)
@@ -149,12 +151,4 @@ class Tree
   end
 end
 
-t = Tree.new([9,8,7,6,5,4,3,2,1])
-t.insert(10)
-t.insert(11)
-t.insert(12)
-p t.balanced?
-t.rebalance
-p t.balanced?
-t.pretty_print
 
